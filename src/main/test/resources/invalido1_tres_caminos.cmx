@@ -1,0 +1,11 @@
+arquitectura RedInvalidaUno :
+    sinapsis peso precision <- 0.91 ;  🍌 ERROR 1: ; al final de instruccion simple
+
+    evaluar precision >= 0.80
+    activar :
+        proyectar "Modelo aprobado"
+    ;
+    descartar :                        🍌 ERROR 2: falta la rama 'recalibrar'
+        proyectar "Modelo rechazado"
+    ;
+;

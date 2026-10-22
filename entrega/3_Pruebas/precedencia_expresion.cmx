@@ -1,0 +1,12 @@
+arquitectura PruebaPrecedencia :
+    sinapsis pulso inhibidor_activo <- inactivo
+    sinapsis peso factor <- 2.0
+    sinapsis peso sesgo <- 0.1
+    sinapsis tensor entrada <- [0.5, 0.8]
+    sinapsis tensor pesos <- [0.2, 0.4]
+    sinapsis tensor capa_norm <- [0.0, 0.0]
+
+    🍌 Expresión compleja con 9 operadores y monitos:
+    sinapsis pulso decision_capa <- 🐒🐒entrada @ pesos + sesgo * 🐒factor ^ 2🐵 ~> capa_norm >= 0.75🐵 && 🐒!inhibidor_activo🐵🐵
+    proyectar "Resultado de precedencia:", decision_capa
+;

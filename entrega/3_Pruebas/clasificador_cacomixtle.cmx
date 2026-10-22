@@ -1,0 +1,55 @@
+🍌
+Archivo: clasificador_cacomixtle.cmx
+Equipo: ComixTech - Lenguajes y Autómatas II
+Descripción: Red neuronal para clasificar señales bioacústicas
+y térmicas del cacomixtle en la sierra de Michoacán.
+🍌
+
+arquitectura ClasificadorCacomixtle :
+
+    🍌 1. Hiperparámetros y estado inicial (los 5 tipos de datos)
+    sinapsis corpus nombre_modelo <- "Red-BioAcustica-Cacomixtle-v1"
+    sinapsis indice epoca_actual <- 1
+    sinapsis indice max_epocas <- 50
+    sinapsis peso tasa_alfa <- 0.05
+    sinapsis peso error_perdida <- 0.85
+    sinapsis peso umbral_convergencia <- 0.10
+    sinapsis pulso red_convergente <- inactivo
+
+    🍌 2. Tensores de entrada, pesos sinápticos y sesgo
+    sinapsis tensor muestras_entrada <- [[0.90, 0.40], [0.25, 0.80]]
+    sinapsis tensor matriz_pesos <- [[0.50, -0.20], [0.30, 0.75]]
+    sinapsis tensor vector_sesgo <- [0.05, 0.05]
+    sinapsis tensor mapa_activacion <- [0.0, 0.0]
+
+    🍌 3. Ingesta de datos
+    ingestar "lote_sierra_michoacan.cmx_data" -> muestras_entrada
+    proyectar "Iniciando entrenamiento de:", nombre_modelo
+
+    🍌 4. Ciclo de entrenamiento por épocas con agrupación de monitos 🐒 🐵
+    entrenar converger 🐒epoca_actual <= max_epocas && 🐒error_perdida > umbral_convergencia🐵🐵 :
+        ajustar mapa_activacion <- 🐒muestras_entrada @ matriz_pesos + vector_sesgo ~> mapa_activacion🐵
+        ajustar error_perdida <- error_perdida - 🐒error_perdida * tasa_alfa ^ 2🐵
+        ajustar epoca_actual <- epoca_actual + 1
+    ;
+
+    sinapsis peso confianza_modelo <- 1.0 - error_perdida
+
+    🍌 5. Evaluación obligatoria de 3 caminos
+    evaluar confianza_modelo >= 0.85
+    activar :
+        ajustar red_convergente <- activo
+        proyectar "Modelo ACTIVADO. Confianza óptima:", confianza_modelo, red_convergente
+    ;
+    recalibrar confianza_modelo >= 0.65 :
+        ajustar red_convergente <- inactivo
+        ajustar tasa_alfa <- tasa_alfa * 0.50
+        proyectar "Modelo en RECALIBRACION. Nueva tasa alfa:", tasa_alfa
+    ;
+    descartar :
+        ajustar red_convergente <- inactivo
+        proyectar "Modelo DESCARTADO por subajuste crítico. Error:", error_perdida
+    ;
+
+    proyectar "Total de épocas ejecutadas:", epoca_actual, "Estado:", red_convergente
+;

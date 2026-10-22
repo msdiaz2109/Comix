@@ -1,0 +1,7 @@
+arquitectura RedInvalidaDos :
+    flotante tasa <- .05               🍌 ERROR 1: 'flotante' prohibida y .05 sin parte entera
+
+    mientras tasa < 1.0 :             🍌 ERROR 2: palabra prohibida 'mientras'
+        ajustar tasa <- tasa + 0.1
+    ;
+;
