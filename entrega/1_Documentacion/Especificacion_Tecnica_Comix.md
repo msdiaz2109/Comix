@@ -32,17 +32,17 @@ En lugar de usar las palabras típicas de otros lenguajes (como `if`, `while` o 
 
 ---
 
-## 2. Contexto de aplicación y problemas que representa
+## 2. Contexto de aplicación y problemas que resuelve
 
-Comix es un Lenguaje de Dominio Específico (DSL) para especificar, preprocesar, entrenar y auditar tuberías de Machine Learning y redes neuronales artificiales. Modela cinco problemas del ciclo de vida de un modelo:
+Comix está diseñado para crear, entrenar y evaluar modelos de Machine Learning (redes neuronales). En lugar de código genérico, resuelve de forma directa las 5 etapas del ciclo de vida de un modelo:
 
-| Etapa del flujo de ML | Problema técnico que modela | Mecanismo nativo en Comix |
-| --- | --- | --- |
-| **1. Topología e hiperparámetros** | Declaración tipada de tasas de aprendizaje ($\alpha$), épocas, semillas, banderas de convergencia y metadatos, sin ambigüedad entre escalares discretos y pesos continuos. | `sinapsis` con tipos `indice`, `peso`, `tensor`, `corpus` y `pulso`, inicializados con el enlace sináptico `<-`. |
-| **2. Ingesta y preprocesamiento tensorial** | Captura de lotes, normalización de características, producto punto entre entradas y pesos ($XW$) y propagación entre capas. | `ingestar` con canal `->`, literales matriciales `[...]`, producto `@` y tubería `~>`. |
-| **3. Entrenamiento por épocas y convergencia** | Repetición de pasos de entrenamiento controlada por un límite de épocas y una tolerancia de error (*loss*). | Bloque `entrenar converger 🐒condicion🐵 :` con `ajustar` para recalibrar pesos en cada época. |
-| **4. Evaluación con tres umbrales** | Un `if`/`else` binario es insuficiente: se distingue aceptación confiable, incertidumbre (recalibración) y rechazo (subajuste o anomalía). | `evaluar <cond>` con ramas `activar :`, `recalibrar <cond2> :` y `descartar :`. |
-| **5. Predicciones y telemetría** | Reporte de etiquetas, probabilidades, precisión (*accuracy*) y estado final de la red. | `proyectar <expr>,...` para escalares, tensores, pulsos y corpus. |
+| Etapa del modelo | ¿Qué problema resuelve? | ¿Cómo se hace en Comix? |
+| :--- | :--- | :--- |
+| **1. Configuración inicial** | Definir parámetros como número de épocas, tasas de aprendizaje y pesos sin confundir números enteros con decimales. | `sinapsis` con tipos propios (`indice`, `peso`, `tensor`, etc.) y asignación `<-`. |
+| **2. Carga y cálculo de datos** | Leer archivos de datos y multiplicar matrices entre capas sin código enredado. | `ingestar ... -> variable`, matrices `[...]`, multiplicación `@` y tubería `~>`. |
+| **3. Entrenamiento por épocas** | Repetir el aprendizaje paso a paso hasta que el margen de error sea aceptable. | Ciclo `entrenar converger 🐒condicion🐵 :` y `ajustar` para actualizar valores. |
+| **4. Evaluación de resultados** | Decidir qué hacer con el resultado: aceptar si es bueno, reajustar si hay dudas o descartar si falló. | `evaluar` con sus 3 caminos obligatorios: `activar`, `recalibrar` y `descartar`. |
+| **5. Salida de predicciones** | Mostrar en pantalla los resultados finales, métricas de precisión o mensajes. | `proyectar <datos>`. |
 
 ---
 
