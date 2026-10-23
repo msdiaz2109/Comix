@@ -58,8 +58,9 @@ El alfabeto formal $\Sigma$ de Comix es el conjunto finito de símbolos que el L
 | **Dígitos ($\Sigma_{digito}$)** | `0` a `9` ($U+0030$ a $U+0039$). |
 | **Operadores aritméticos y algebraicos** | `+`, `-`, `*`, `/`, `%`, `^`, `@`, `~>` |
 | **Flujo, enlace y relación** | `<`, `>`, `=`, `!`, `&`, `|`, `->`, `<-` |
-| **Delimitadores y puntuación** | `:`, `;`, `[`, `]`, `,`, `🐒`, `🐵` |
-| **Emoji de comentarios ($\Sigma_{emoji}$)** | 🍌 (Banana, $U+1F34C$): inicia comentario de una línea y abre/cierra comentario multilínea. |
+| **Delimitadores y puntuación** | `:`, `;`, `[`, `]`, `,` |
+| **Emojis de monitos ($\Sigma_{agrupacion}$)** | 🐒 ($U+1F412$, abre agrupación) y 🐵 ($U+1F435$, cierra agrupación). Atajo en Windows: combinación de teclas `Win + .` (escribir "mono"). |
+| **Emoji de comentarios ($\Sigma_{emoji}$)** | 🍌 (Banana, $U+1F34C$): inicia comentario de una línea y abre/cierra comentario multilínea. Atajo en Windows: combinación de teclas `Win + .` (escribir "banana"). |
 | **Espaciado ($\Sigma_{espacio}$)** | Espacio ($U+0020$), tabulador `\t` ($U+0009$), retorno de carro `\r` ($U+000D$) y salto de línea `\n` ($U+000A$). |
 
 ### 3.2 Reglas léxicas formales
