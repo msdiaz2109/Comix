@@ -2,23 +2,9 @@
 
 ## Fase 1 y Fase 2: Gramática en ANTLR4
 
-| Campo | Detalle |
-| --- | --- |
-| **Materia** | Lenguajes y Autómatas II |
-| **Equipo diseñador** | Comix Tech |
-| **Lenguaje** | Comix |
-| **Extensión oficial** | `.cmx` |
-| **Paradigma** | Declarativo de flujo de datos sináptico e imperativo-estructurado, orientado a Machine Learning |
-
----
-
 ## 1. Nombre del lenguaje y justificación de su diseño
 
-### 1.1 Origen e identidad
-
-Comix (archivos fuente `.cmx`) nace en el equipo ComixTech como una fusión entre la identidad biocultural de Michoacán y la ingeniería de sistemas inteligentes. Su nombre proviene del cacomixtle (*Bassariscus astutus*), mamífero nocturno endémico de los ecosistemas michoacanos, reconocido por su agilidad sensorial, su adaptación a entornos complejos y su precisión para explorar rutas.
-
-Un modelo de Machine Learning opera de forma análoga al sistema nervioso de un cacomixtle: capta estímulos crudos (ingesta de muestras), los propaga por conexiones ponderadas (sinapsis y tensores), recalibra su comportamiento con la experiencia (entrenamiento por épocas) y emite respuestas adaptativas (predicciones).
+Comix es un modelo de Machine Learning que opera de forma análoga al sistema nervioso de un cacomixtle: capta estímulos crudos (ingesta de muestras), los propaga por conexiones ponderadas (sinapsis y tensores), recalibra su comportamiento con la experiencia (entrenamiento por épocas) y emite respuestas adaptativas (predicciones).
 
 El símbolo Unicode 🍌, usado para los comentarios de una línea y de bloque, junto con la agrupación de expresiones mediante los emojis de monitos 🐒 y 🐵, refuerzan una identidad visual lúdica, coherente y memorable que distingue a `.cmx` de los lenguajes tradicionales.
 
@@ -26,14 +12,14 @@ El símbolo Unicode 🍌, usado para los comentarios de una línea y de bloque, 
 
 En lenguajes de propósito general (C, Java, Python) los flujos de ML se implementan como bibliotecas externas sobre estructuras imperativas genéricas (`for`, `while`, `if`/`else`, `int`, `float`). Esto genera una desconexión entre la matemática del modelo y el código. Comix la resuelve con tres decisiones:
 
-1. **Vocabulario cognitivo y matemático nativo.** Se eliminan las palabras reservadas genéricas (`if`, `else`, `while`, `for`, `int`, `float`, `string`, `print`, `input`, `var`, `return`) y sus traducciones literales (`si`, `sino`, `mientras`, `para`, `entero`, `flotante`, `cadena`, `imprimir`). Cada construcción nombra el concepto que modela:
-    - Un programa es una `arquitectura`.
-    - Las variables son `sinapsis` (conexiones de memoria).
-    - La mutación de parámetros durante el descenso de gradiente es `ajustar`.
-    - Los ciclos iteran hasta converger mediante `entrenar`.
-    - Las decisiones evalúan hipótesis con tres umbrales obligatorios: `evaluar` / `activar` / `recalibrar` / `descartar`.
-2. **Álgebra lineal y tuberías de capas como operadores.** En lugar de anidar llamadas como `activar(sumar(multiplicar(X, W), b))`, la gramática incorpora el producto matricial `@` y la tubería de propagación `~>`, de modo que `X @ W + b ~> umbral` se lee en el mismo sentido del *forward pass*.
-3. **Delimitación limpia con `:` y `;`.** Las instrucciones simples nunca terminan en `;`; cada una comienza con un verbo de dominio inequívoco (`sinapsis`, `ajustar`, `ingestar`, `proyectar`) que marca sus límites sin ruido visual. Los bloques compuestos (`arquitectura`, ramas de decisión y cuerpo del ciclo) se abren con `:` y se cierran exclusivamente con `;`, lo que da una simetría explícita de inicio y fin de alcance.
+1. **Vocabulario nativo de Machine Learning.** Se reemplazan las estructuras convencionales por conceptos del dominio:
+    - `arquitectura`: define el programa principal.
+    - `sinapsis`: declara variables y conexiones de memoria.
+    - `ajustar`: modifica el valor de una sinapsis existente.
+    - `entrenar converger`: estructura de repetición iterativa por épocas.
+    - `evaluar`: decisión con tres caminos obligatorios (`activar`, `recalibrar`, `descartar`).
+2. **Operadores de álgebra lineal.** Soporte directo para producto matricial (`@`) y propagación entre capas (`~>`), simplificando expresiones tensoriales.
+3. **Delimitación de bloques.** Bloques delimitados simétricamente con `:` de apertura y `;` de cierre. Las instrucciones simples no llevan `;`.
 
 ---
 
