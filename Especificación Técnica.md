@@ -8,18 +8,27 @@ Comix es un modelo de Machine Learning que opera de forma análoga al sistema ne
 
 El símbolo Unicode 🍌, usado para los comentarios de una línea y de bloque, junto con la agrupación de expresiones mediante los emojis de monitos 🐒 y 🐵, refuerzan una identidad visual lúdica, coherente y memorable que distingue a `.cmx` de los lenguajes tradicionales.
 
-### 1.2 Filosofía de diseño: flujos de ML como ciudadanos de primera clase
+### 1.2 Cómo funciona Comix: Conceptos clave explicados de forma sencilla
 
-En lenguajes de propósito general (C, Java, Python) los flujos de ML se implementan como bibliotecas externas sobre estructuras imperativas genéricas (`for`, `while`, `if`/`else`, `int`, `float`). Esto genera una desconexión entre la matemática del modelo y el código. Comix la resuelve con tres decisiones:
+En lugar de usar las palabras típicas de otros lenguajes (como `if`, `while` o `int`), Comix utiliza términos inspirados en el funcionamiento de una red neuronal para que el código represente directamente un proceso de aprendizaje:
 
-1. **Vocabulario nativo de Machine Learning.** Se reemplazan las estructuras convencionales por conceptos del dominio:
-    - `arquitectura`: define el programa principal.
-    - `sinapsis`: declara variables y conexiones de memoria.
-    - `ajustar`: modifica el valor de una sinapsis existente.
-    - `entrenar converger`: estructura de repetición iterativa por épocas.
-    - `evaluar`: decisión con tres caminos obligatorios (`activar`, `recalibrar`, `descartar`).
-2. **Operadores de álgebra lineal.** Soporte directo para producto matricial (`@`) y propagación entre capas (`~>`), simplificando expresiones tensoriales.
-3. **Delimitación de bloques.** Bloques delimitados simétricamente con `:` de apertura y `;` de cierre. Las instrucciones simples no llevan `;`.
+1. **Vocabulario y cómo se usa:**
+    - **`arquitectura` (El programa principal):** Es el contenedor donde se define todo el modelo o red neuronal.
+    - **`sinapsis` (Declarar variables):** En una red, la información se almacena en las conexiones sinápticas. Se utiliza para crear variables y darles un valor inicial (por ejemplo: tasas de aprendizaje, contadores o tensores de pesos).
+    - **`ajustar` (Modificar un valor):** Conforme la red aprende, recalibra sus valores. Se utiliza para actualizar una sinapsis ya creada (por ejemplo: `ajustar tasa <- tasa * 0.95`).
+    - **`entrenar converger` (Repetir / Ciclo):** Es la estructura que repite las instrucciones una y otra vez (por épocas) mientras se cumpla una condición de entrenamiento.
+    - **`evaluar` (Tomar decisiones con 3 opciones):** A diferencia de un condicional tradicional de dos caminos (sí / no), un modelo inteligente requiere tres posibles respuestas ante una métrica:
+        - `activar`: Si la confianza es alta, el modelo aprueba y emite el resultado.
+        - `recalibrar`: Si hay incertidumbre, el modelo reajusta parámetros para seguir mejorando.
+        - `descartar`: Si el resultado no cumple los mínimos, se rechaza la muestra.
+    - **`ingestar` y `proyectar` (Entrada y salida):** `ingestar` sirve para cargar datos o muestras desde archivos o consola, y `proyectar` muestra en pantalla predicciones y métricas.
+
+2. **Operaciones matemáticas directas:**
+    - Se cuenta con operadores nativos para álgebra lineal: el producto matricial `@` para multiplicar capas y la tubería `~>` para enviar datos hacia la siguiente capa (por ejemplo: `muestras @ pesos ~> salida`).
+
+3. **Reglas para escribir el código (Delimitación):**
+    - **Bloques:** Todo bloque (`arquitectura`, ciclo o condición) se abre con `:` y se cierra exclusivamente con `;`.
+    - **Líneas simples:** Las instrucciones sencillas no llevan punto y coma al final, lo que mantiene el código limpio y legible.
 
 ---
 
