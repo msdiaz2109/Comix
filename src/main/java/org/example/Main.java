@@ -50,14 +50,22 @@ public class Main {
         System.out.println("================================================================================");
         System.out.println("Directorio de pruebas: " + DIRBASE + "\n");
 
-        for (String file : FILES) {
+        String[] filesToRun = (args != null && args.length > 0) ? args : FILES;
+
+        for (String file : filesToRun) {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println(">>> ANALIZANDO ARCHIVO: " + file);
             System.out.println("--------------------------------------------------------------------------------");
 
-            File sourceFile = new File(DIRBASE + file);
+            File sourceFile = new File(file);
             if (!sourceFile.exists()) {
-                System.err.println("Archivo no encontrado: " + sourceFile.getAbsolutePath());
+                sourceFile = new File(DIRBASE + file);
+            }
+            if (!sourceFile.exists()) {
+                sourceFile = new File("entrega/3_Pruebas/" + file);
+            }
+            if (!sourceFile.exists()) {
+                System.err.println("Archivo no encontrado: " + file);
                 continue;
             }
 
