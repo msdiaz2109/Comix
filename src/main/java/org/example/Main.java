@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.parser.ComixBaseVisitor;
+import org.parser.ComixCustomVisitor;
 import org.parser.ComixLexer;
 import org.parser.ComixParser;
 
@@ -25,6 +26,7 @@ public class Main {
 
     private static final String DIRBASE = "src/main/test/resources/";
     private static final String[] FILES = {
+            "prueba_visitor_operaciones.cmx",
             "clasificador_cacomixtle.cmx",
             "precedencia_expresion.cmx",
             "invalido1_tres_caminos.cmx",
@@ -108,15 +110,9 @@ public class Main {
                 System.out.println("\n[3] ÁRBOL SINTÁCTICO (Notación textual LISP):");
                 System.out.println(tree.toStringTree(parser));
 
-                // Visitor opcional
-                ComixBaseVisitor<Object> visitor = new ComixBaseVisitor<>() {
-                    @Override
-                    public Object visitPrograma(ComixParser.ProgramaContext ctx) {
-                        System.out.println("\n[4] VISITOR: Arquitectura '" + ctx.ID().getText() + "' contiene "
-                                + ctx.bloque().instruccion().size() + " instrucción(es) en el bloque principal.");
-                        return super.visitPrograma(ctx);
-                    }
-                };
+                // Ejecución del Visitor (Evaluador / Intérprete)
+                System.out.println("\n[4] VISITOR (EVALUACIÓN Y EJECUCIÓN):");
+                ComixCustomVisitor visitor = new ComixCustomVisitor();
                 visitor.visit(tree);
 
                 // Exportar Árboles para el archivo principal

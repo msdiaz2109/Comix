@@ -1,0 +1,31 @@
+🍌
+Archivo: prueba_visitor_operaciones.cmx
+Demostración de evaluación de operaciones aritméticas en Comix
+(Suma, Resta, Multiplicación, División diagonal y Precedencia)
+🍌
+
+arquitectura CalculadoraComix :
+    sinapsis indice a <- 10
+    sinapsis indice b <- 5
+    sinapsis indice c <- 2
+
+    🍌 Operaciones básicas (+, -, *, /)
+    sinapsis indice suma <- a + b
+    sinapsis indice resta <- a - b
+    sinapsis indice multiplicacion <- b * c
+    sinapsis indice division <- a / b
+
+    🍌 Operación combinada para verificar precedencia (* y / antes de + y -)
+    🍌 10 + (5 * 2) - (4 / 2) = 10 + 10 - 2 = 18
+    sinapsis indice resultado_precedencia <- a + b * c - 4 / 2
+
+    proyectar "Valor de a:", a
+    proyectar "Valor de b:", b
+    proyectar "Valor de c:", c
+    proyectar "Suma (10 + 5):", suma
+    proyectar "Resta (10 - 5):", resta
+    proyectar "Multiplicacion (5 * 2):", multiplicacion
+    proyectar "Division (10 / 5):", division
+    proyectar "Precedencia combinada (10 + 5 * 2 - 4 / 2 = 18):", resultado_precedencia
+;
+
