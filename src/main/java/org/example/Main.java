@@ -26,11 +26,18 @@ public class Main {
 
     private static final String DIRBASE = "src/main/test/resources/";
     private static final String[] FILES = {
-            "prueba_visitor_operaciones.cmx",
+            // --- CASOS DE PRUEBA VÁLIDOS ---
+            "valido1_visitor_completo.cmx",
+            "valido2_expresiones_tarea.cmx",
             "clasificador_cacomixtle.cmx",
-            "precedencia_expresion.cmx",
+
+            // --- CASOS DE PRUEBA INVÁLIDOS SINTÁCTICOS / LÉXICOS (RECHAZADOS POR EL PARSER) ---
             "invalido1_tres_caminos.cmx",
-            "invalido2_palabras_prohibidas.cmx"
+            "invalido2_palabras_prohibidas.cmx",
+
+            // --- CASOS DE PRUEBA INVÁLIDOS SEMÁNTICOS (CAPTURADOS POR EL VISITOR) ---
+            "invalido3_visitor_division_cero.cmx",
+            "invalido4_visitor_variable_no_declarada.cmx"
     };
 
     // Listener para recolectar errores léxicos y sintácticos
@@ -114,17 +121,18 @@ public class Main {
                 ComixCustomVisitor visitor = new ComixCustomVisitor();
                 visitor.visit(tree);
 
-                // Exportar Árboles para el archivo principal
-                if (file.equals("clasificador_cacomixtle.cmx")) {
-                    exportarArbolGrafico(tree, parser, "antlr4_parse_tree.png");
-                    exportarArbolGrafico(tree, parser, "entrega/4_Arbol_Sintactico/arbol_sintactico.png");
-                    exportarArbolSvg(tree, parser, "arbol_sintactico.svg");
-                    exportarArbolSvg(tree, parser, "entrega/4_Arbol_Sintactico/arbol_sintactico.svg");
+                // Exportar Árboles para el archivo principal si las dependencias gráficas están presentes
+                if (file.contains("clasificador_cacomixtle")) {
                     try {
+                        exportarArbolGrafico(tree, parser, "antlr4_parse_tree.png");
+                        exportarArbolGrafico(tree, parser, "entrega/4_Arbol_Sintactico/arbol_sintactico.png");
+                        exportarArbolSvg(tree, parser, "arbol_sintactico.svg");
+                        exportarArbolSvg(tree, parser, "entrega/4_Arbol_Sintactico/arbol_sintactico.svg");
                         if (!GraphicsEnvironment.isHeadless()) {
                             Trees.inspect(tree, parser);
                         }
-                    } catch (Exception ignored) {
+                    } catch (Throwable ignored) {
+                        // Librerías gráficas opcionales (abego treelayout) no disponibles en entorno headless
                     }
                 }
             } else {

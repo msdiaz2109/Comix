@@ -1,0 +1,36 @@
+🍌
+================================================================================
+CASO DE PRUEBA INVÁLIDO 3 (SEMÁNTICO / VISITOR): División Entre Cero
+================================================================================
+La sintaxis del archivo es 100% válida y pasa el análisis léxico y sintáctico.
+Sin embargo, en tiempo de ejecución, el Visitor detecta una operación de 
+división entre cero (diagonal / con divisor 0).
+
+El Visitor debe atrapar el error semántico en ejecución:
+- Mostrar mensaje: "Error en ejecución: División entre cero (/ detectado). Se retorna 0."
+- Proteger el flujo del intérprete para que el compilador no se caiga (crash).
+================================================================================
+🍌
+
+arquitectura PruebaInvalidaDivisionCero :
+
+    sinapsis indice dividendo <- 100
+    sinapsis indice cero <- 0
+    sinapsis indice divisor_calculado <- 5 - 5
+
+    proyectar "Iniciando prueba de división entre cero..."
+
+    🍌 Intento 1: División directa entre el literal 0
+    sinapsis indice resultado1 <- dividendo / 0
+    proyectar "Resultado de dividir entre literal 0:", resultado1
+
+    🍌 Intento 2: División entre variable con valor 0
+    sinapsis indice resultado2 <- dividendo / cero
+    proyectar "Resultado de dividir entre variable cero:", resultado2
+
+    🍌 Intento 3: División entre expresión que evalúa a 0 (5 - 5)
+    sinapsis indice resultado3 <- dividendo / divisor_calculado
+    proyectar "Resultado de dividir entre expresion 5 - 5:", resultado3
+
+    proyectar "El interprete continuo ejecutando de forma segura sin caerse."
+;

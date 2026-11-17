@@ -1,0 +1,38 @@
+🍌
+================================================================================
+CASO DE PRUEBA INVÁLIDO 4 (SEMÁNTICO / VISITOR): Variables No Inicializadas
+================================================================================
+La sintaxis del archivo es válida según la gramática ANTLR4, pero en tiempo de
+ejecución el Visitor intenta hacer un [GET] de variables que jamás fueron
+declaradas ni guardadas previamente en la tabla de símbolos (memoria).
+
+El Visitor debe reportar la advertencia semántica:
+- Advertencia: "Variable 'variable_fantasma' no encontrada en memoria. Usando valor 0."
+- Asignar un valor seguro por defecto para continuar la ejecución sin excepción fatal.
+================================================================================
+🍌
+
+arquitectura PruebaInvalidaVariableNoDeclarada :
+
+    sinapsis indice variable_valida <- 50
+
+    proyectar "Iniciando prueba de lectura de variables inexistentes..."
+
+    🍌 Intento de uso de variable jamás declarada en una expresión aritmética
+    sinapsis indice calculo_con_error <- variable_valida + variable_fantasma * 2
+    proyectar "Resultado de usar variable_fantasma:", calculo_con_error
+
+    🍌 Intento de uso de variable no inicializada en una comparación lógica
+    evaluar variable_inexistente > 10
+    activar :
+        proyectar "No deberia activarse"
+    ;
+    recalibrar variable_inexistente == 0 :
+        proyectar "Entro a recalibrar porque la variable no inicializada devolvio 0 por seguridad"
+    ;
+    descartar :
+        proyectar "Rama descartar"
+    ;
+
+    proyectar "El visitor capturo las variables no inicializadas correctamente."
+;

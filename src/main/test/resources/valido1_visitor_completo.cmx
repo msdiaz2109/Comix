@@ -1,0 +1,63 @@
+🍌
+================================================================================
+CASO DE PRUEBA VÁLIDO 1: Demostración Completa del Intérprete y Visitor
+================================================================================
+Este archivo demuestra todas las capacidades agregadas en el Visitor:
+1. Declaración con valor inicial (PUT en memoria).
+2. Asignación y actualización de variables (PUT en memoria).
+3. Uso de variables en expresiones (GET desde memoria).
+4. Operaciones aritméticas respetando precedencia (+, -, *, /).
+5. Evaluación de comparaciones relacionales (>, <, >=, <=, ==).
+6. Control de flujo condicional de 3 caminos (IF, ELSE IF, ELSE).
+7. Control de flujo repetitivo por épocas (WHILE).
+8. Sentencia de salida a consola (PRINT / proyectar).
+================================================================================
+🍌
+
+arquitectura PruebaVisitorCompleta :
+
+    🍌 1. Declaraciones de los tipos de datos nativos (PUT en tabla de símbolos)
+    sinapsis corpus nombre_prueba <- "Validacion Completa del Visitor"
+    sinapsis indice contador <- 1
+    sinapsis indice limite <- 3
+    sinapsis peso tasa_aprendizaje <- 0.05
+    sinapsis peso factor_escala <- 2.5
+    sinapsis pulso sistema_listo <- activo
+
+    proyectar "=== INICIANDO: ", nombre_prueba, "==="
+    proyectar "Estado inicial del sistema:", sistema_listo
+
+    🍌 2. Expresiones aritméticas con precedencia (* y / antes de + y -)
+    🍌 Cálculo: 10 + (5 * 2) - (8 / 4) = 10 + 10 - 2 = 18
+    sinapsis indice resultado_aritmetico <- 10 + 5 * 2 - 8 / 4
+    proyectar "Resultado de precedencia (10 + 5 * 2 - 8 / 4):", resultado_aritmetico
+
+    🍌 3. Operación aritmética combinada con variables (GET a nivel de factor)
+    sinapsis peso calculo_flotante <- tasa_aprendizaje * factor_escala + 1.0
+    proyectar "Calculo flotante (0.05 * 2.5 + 1.0):", calculo_flotante
+
+    🍌 4. Reasignación de variables (PUT a nivel de asignación)
+    ajustar contador <- contador + 1
+    proyectar "Contador tras incremento:", contador
+
+    🍌 5. Control de flujo condicional: IF / ELSE IF / ELSE (evaluar / activar / recalibrar / descartar)
+    evaluar resultado_aritmetico == 18
+    activar :
+        proyectar "RAMA IF (activar): El resultado es exactamente 18 (Correcto)"
+    ;
+    recalibrar resultado_aritmetico > 10 :
+        proyectar "RAMA ELSE IF (recalibrar): El resultado es mayor a 10"
+    ;
+    descartar :
+        proyectar "RAMA ELSE (descartar): Ninguna condicion se cumplio"
+    ;
+
+    🍌 6. Control de flujo repetitivo (WHILE / entrenar converger)
+    proyectar "Iniciando bucle de entrenamiento..."
+    entrenar converger contador <= limite :
+        proyectar "  -> Ejecutando ciclo de iteracion:", contador
+        ajustar contador <- contador + 1
+    ;
+
+    proyectar "=== PRUEBA VALIDA COMPLETADA CON EXITO ==="
+;
