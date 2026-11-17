@@ -1,0 +1,69 @@
+🍌
+Archivo: expresiones_tarea.cmx
+Pruebas oficiales de expresiones aritméticas y lógicas con Comix
+🍌
+
+arquitectura ExpresionesAritmeticasLogicas :
+
+    🍌 Declaraciones con valor inicial
+    sinapsis indice a <- 2
+    sinapsis indice b <- 3
+    sinapsis indice valor <- 5
+    sinapsis indice y <- 4
+
+    proyectar "--- EVALUACIÓN DE LAS 9 EXPRESIONES ---"
+
+    🍌 1. a + b * (3 + 1) - 6 -> Esperado: 2 + 12 - 6 = 8
+    sinapsis indice exp1 <- a + b * 🐒3 + 1🐵 - 6
+    proyectar "1. a + b * (3 + 1) - 6 =", exp1
+
+    🍌 2. (3 + 4) * (2 - 1) -> Esperado: 7 * 1 = 7
+    sinapsis indice exp2 <- 🐒3 + 4🐵 * 🐒2 - 1🐵
+    proyectar "2. (3 + 4) * (2 - 1) =", exp2
+
+    🍌 3. 10 + valor * 4 -> Esperado: 10 + 20 = 30
+    sinapsis indice exp3 <- 10 + valor * 4
+    proyectar "3. 10 + valor * 4 =", exp3
+
+    🍌 4. 5 + 3 * 4 + 2 / 3 -> Esperado: 5 + 12 + 0 = 17
+    sinapsis indice exp4 <- 5 + 3 * 4 + 2 / 3
+    proyectar "4. 5 + 3 * 4 + 2 / 3 =", exp4
+
+    🍌 5. 10 + y -> Esperado: 10 + 4 = 14
+    sinapsis indice exp5 <- 10 + y
+    proyectar "5. 10 + y =", exp5
+
+    🍌 6. 10 > 4 -> Esperado: true
+    sinapsis pulso exp6 <- 10 > 4
+    proyectar "6. 10 > 4 =", exp6
+
+    🍌 7. 5 + 2 > 3 * 4 -> Esperado: 7 > 12 = false
+    sinapsis pulso exp7 <- 5 + 2 > 3 * 4
+    proyectar "7. 5 + 2 > 3 * 4 =", exp7
+
+    🍌 8. (20 - valor) / 5 + 3 -> Esperado: 15 / 5 + 3 = 6
+    sinapsis indice exp8 <- 🐒20 - valor🐵 / 5 + 3
+    proyectar "8. (20 - valor) / 5 + 3 =", exp8
+
+    🍌 9. 5 + 3 * 2 -> Esperado: 5 + 6 = 11
+    sinapsis indice exp9 <- 5 + 3 * 2
+    proyectar "9. 5 + 3 * 2 =", exp9
+
+    🍌 Demostración de Reasignación (Asignación)
+    ajustar a <- a + 10
+    proyectar "Nuevo valor de a tras reasignacion:", a
+
+    🍌 Demostración de IF / ELSE IF / ELSE
+    evaluar exp6
+    activar :
+        proyectar "Condicional IF: exp6 es verdadero (10 > 4)"
+    ;
+    recalibrar exp7 :
+        proyectar "Condicional ELSE IF: exp7"
+    ;
+    descartar :
+        proyectar "Condicional ELSE"
+    ;
+
+    proyectar "--- FIN DE PRUEBAS ---"
+;

@@ -3,13 +3,30 @@ package org.parser;
 import java.util.*;
 
 /**
- * Intérprete y evaluador para Comix utilizando el patrón Visitor.
- * Implementa la evaluación de expresiones aritméticas (+, -, *, /),
- * operadores lógicos, asignaciones y control de flujo.
+ * ============================================================================
+ * CLASE: ComixCustomVisitor (Intérprete Completo de Comix con ANTLR4)
+ * ============================================================================
+ * Esta clase implementa el patrón Visitor extendiendo de ComixBaseVisitor<Object>.
+ * Funciona como el intérprete en tiempo de ejecución del lenguaje Comix,
+ * cumpliendo con todos los requerimientos de la especificación:
+ * 
+ * 1. Tabla de Símbolos / Memoria (Map<String, Object> memoria con GET y PUT).
+ * 2. Valores por defecto en declaraciones no inicializadas (int=0, float=0.0, bool=false, str="").
+ * 3. Asignaciones con actualización en memoria.
+ * 4. Lectura de factores/identificadores con memoria.get(id).
+ * 5. Evaluación aritmética (+, -, *, /) con precedencia y división protegida contra 0.
+ * 6. Soporte para enteros, flotantes (double) y concatenación de cadenas.
+ * 7. Comparaciones relacionales (>, <, >=, <=, ==, !=) devolviendo booleanos.
+ * 8. Sentencias de impresión ([PRINT] <valor>).
+ * 9. Control de flujo condicional (if / elseIf / else).
+ * 10. Control de flujo repetitivo (ciclos / bucles).
+ * 11. Formato exacto de trazado en consola línea por línea y estado final de variables.
  */
 public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
 
-    // Tabla de símbolos / memoria de variables en tiempo de ejecución
+    // ============================================================
+    // 1. TABLA DE SÍMBOLOS / MEMORIA DEL PROGRAMA
+    // ============================================================
     private final Map<String, Object> memoria = new LinkedHashMap<>();
 
     public Map<String, Object> getMemoria() {
@@ -17,15 +34,26 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     // ============================================================
-    // 1. ESTRUCTURA PRINCIPAL Y BLOQUES
+    // 2. RECORRIDO DEL PROGRAMA PRINCIPAL Y BLOQUES
     // ============================================================
 
     @Override
     public Object visitPrograma(ComixParser.ProgramaContext ctx) {
-        System.out.println("\n[VISITOR] === Iniciando ejecución de la arquitectura: " + ctx.ID().getText() + " ===");
-        Object result = visit(ctx.bloque());
-        System.out.println("[VISITOR] === Ejecución finalizada con éxito ===\n");
-        return result;
+        int totalInstrucciones = (ctx.bloque() != null && ctx.bloque().instruccion() != null)
+                ? ctx.bloque().instruccion().size()
+                : 0;
+
+        // Formato exacto de inicio requerido
+        System.out.println("=== INICIANDO RECORRIDO CON CUSTOM VISITOR ===");
+        System.out.println("-> Visitando programa con " + totalInstrucciones + " instruccion(es).");
+
+        // Ejecutar las instrucciones del bloque principal
+        Object resultado = visit(ctx.bloque());
+
+        // Formato exacto de cierre requerido con el estado final de las variables
+        System.out.println("=== ESTADO FINAL DE VARIABLES: " + memoria + " ===");
+
+        return resultado;
     }
 
     @Override
@@ -43,33 +71,73 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     // ============================================================
-    // 2. DECLARACIÓN Y AJUSTE DE SINAPSIS (VARIABLES)
+    // 3. DECLARACIONES Y ASIGNACIONES (PUT EN MEMORIA)
     // ============================================================
 
+    /**
+     * DECLARACIÓN DE VARIABLES:
+     * Si no tiene valor inicial asignado, se le da un valor por defecto:
+     * - indice / int   -> 0
+     * - peso / float   -> 0.0
+     * - corpus / str   -> ""
+     * - pulso / bool   -> false
+     * - tensor / lista -> []
+     * Si tiene expresión inicial, se evalúa y se guarda con memoria.put(id, valor).
+     */
     @Override
     public Object visitDeclaracionSinapsis(ComixParser.DeclaracionSinapsisContext ctx) {
-        String nombreVar = ctx.ID().getText();
-        Object valor = visit(ctx.expresion());
-        memoria.put(nombreVar, valor);
+        int linea = ctx.getStart().getLine();
+        String tipo = ctx.tipoDato().getText();
+        String id = ctx.ID().getText();
+
+        Object valor;
+        if (ctx.expresion() != null) {
+            valor = visit(ctx.expresion());
+        } else {
+            valor = obtenerValorPorDefecto(tipo);
+        }
+
+        // PUT a nivel de declaración
+        memoria.put(id, valor);
+
+        // Formato exacto requerido: Linea X: [Declaración] <tipo> <id> = <valor>
+        System.out.printf("Linea %d: [Declaración] %s %s = %s%n", linea, tipo, id, formatearValor(valor));
         return valor;
     }
 
+    /**
+     * ASIGNACIÓN DE VARIABLES:
+     * Evalúa la expresión a la derecha de <- y actualiza el valor en memoria con memoria.put(id, valor).
+     */
     @Override
     public Object visitAjusteSinapsis(ComixParser.AjusteSinapsisContext ctx) {
-        String nombreVar = ctx.ID().getText();
+        int linea = ctx.getStart().getLine();
+        String id = ctx.ID().getText();
+
+        // Evalúa la expresión
         Object valor = visit(ctx.expresion());
-        memoria.put(nombreVar, valor);
+
+        // PUT a nivel de asignación
+        memoria.put(id, valor);
+
+        // Formato exacto requerido: Linea X: [Asignación] <id> = <valor>
+        System.out.printf("Linea %d: [Asignación] %s = %s%n", linea, id, formatearValor(valor));
         return valor;
     }
 
     // ============================================================
-    // 3. ENTRADA Y SALIDA
+    // 4. SENTENCIA DE IMPRESIÓN (PRINT)
     // ============================================================
 
+    /**
+     * IMPRESIÓN (proyectar en Comix / print):
+     * Evalúa las expresiones a imprimir y las muestra en consola.
+     */
     @Override
     public Object visitProyeccionSalida(ComixParser.ProyeccionSalidaContext ctx) {
+        int linea = ctx.getStart().getLine();
         StringBuilder sb = new StringBuilder();
-        sb.append("[PROYECCIÓN] ");
+
         for (int i = 0; i < ctx.expresion().size(); i++) {
             Object val = visit(ctx.expresion(i));
             sb.append(formatearValor(val));
@@ -77,47 +145,75 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
                 sb.append(" ");
             }
         }
-        System.out.println(sb);
+
+        // Formato exacto requerido: Linea X: [PRINT] <valor>
+        System.out.printf("Linea %d: [PRINT] %s%n", linea, sb.toString());
         return null;
     }
 
     @Override
     public Object visitIngestaDatos(ComixParser.IngestaDatosContext ctx) {
+        int linea = ctx.getStart().getLine();
         String destino = (ctx.ID() != null) ? ctx.ID().getText() : "desconocido";
         if (ctx.CANAL_INGESTA() != null) {
-            System.out.println("[INGESTA] Datos cargados desde " + ctx.LIT_CORPUS().getText() + " hacia '" + destino + "'");
+            System.out.printf("Linea %d: [Ingesta] %s -> %s%n", linea, ctx.LIT_CORPUS().getText(), destino);
         } else {
-            System.out.println("[INGESTA] Ingestando datos hacia '" + destino + "'");
+            System.out.printf("Linea %d: [Ingesta] %s%n", linea, destino);
         }
         return null;
     }
 
     // ============================================================
-    // 4. CONTROL DE FLUJO (EVALUAR Y ENTRENAR)
+    // 5. CONTROL DE FLUJO: IF / ELSE IF / ELSE Y BUCLES
     // ============================================================
 
+    /**
+     * ESTRUCTURA CONDICIONAL (IF / ELSE IF / ELSE):
+     * En Comix:
+     * - evaluar <exp1> activar <bloque1>          -> if (cond1) { bloque1 }
+     * - recalibrar <exp2> <bloque2>               -> else if (cond2) { bloque2 }
+     * - descartar <bloque3>                       -> else { bloque3 }
+     */
     @Override
     public Object visitDecisionEvaluar(ComixParser.DecisionEvaluarContext ctx) {
-        // evalua la primera rama: activar
-        boolean condActivar = aBooleano(visit(ctx.expresion(0)));
-        if (condActivar) {
+        int linea = ctx.getStart().getLine();
+
+        // 1. Evalúa la condición principal del IF (evaluar)
+        Object condIf = visit(ctx.expresion(0));
+        if (aBooleano(condIf)) {
+            System.out.printf("Linea %d: [IF] Condición verdadera -> ejecutando rama principal%n", linea);
             return visit(ctx.bloque(0));
         }
 
-        // evalua la segunda rama: recalibrar
-        boolean condRecalibrar = aBooleano(visit(ctx.expresion(1)));
-        if (condRecalibrar) {
-            return visit(ctx.bloque(1));
+        // 2. Si es falsa, evalúa los elseIf en orden (recalibrar)
+        if (ctx.expresion().size() > 1 && ctx.bloque().size() > 1) {
+            Object condElseIf = visit(ctx.expresion(1));
+            if (aBooleano(condElseIf)) {
+                System.out.printf("Linea %d: [ELSE IF] Condición verdadera -> ejecutando rama alterna%n", linea);
+                return visit(ctx.bloque(1));
+            }
         }
 
-        // si ninguna se cumple, ejecuta la rama por defecto: descartar
-        return visit(ctx.bloque(2));
+        // 3. Si ninguno se cumple, ejecuta el bloque ELSE (descartar)
+        if (ctx.bloque().size() > 2) {
+            System.out.printf("Linea %d: [ELSE] Ninguna condición previa se cumplió -> ejecutando rama por defecto%n", linea);
+            return visit(ctx.bloque(2));
+        }
+
+        return null;
     }
 
+    /**
+     * BUCLE REPETITIVO (for / while / entrenar converger):
+     * Evalúa la condición antes de cada iteración y ejecuta el bloque mientras sea verdadera.
+     */
     @Override
     public Object visitCicloEntrenar(ComixParser.CicloEntrenarContext ctx) {
+        int linea = ctx.getStart().getLine();
         int limiteSeguridad = 1000;
         int iteracion = 0;
+
+        System.out.printf("Linea %d: [Bucle] Iniciando ejecución del ciclo%n", linea);
         while (aBooleano(visit(ctx.expresion())) && iteracion < limiteSeguridad) {
             visit(ctx.bloque());
             iteracion++;
@@ -126,7 +222,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     // ============================================================
-    // 5. EXPRESIONES ARITMÉTICAS Y OPERADORES (PATRÓN DE CLASE)
+    // 6. EVALUACIÓN DE EXPRESIONES ARITMÉTICAS Y LÓGICAS
     // ============================================================
 
     @Override
@@ -134,6 +230,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return visit(ctx.exprDisyuncion());
     }
 
+    // Disyunción lógica (||)
     @Override
     public Object visitExprDisyuncion(ComixParser.ExprDisyuncionContext ctx) {
         Object result = visit(ctx.exprConjuncion(0));
@@ -145,6 +242,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return result;
     }
 
+    // Conjunción lógica (&&)
     @Override
     public Object visitExprConjuncion(ComixParser.ExprConjuncionContext ctx) {
         Object result = visit(ctx.exprIgualdad(0));
@@ -156,6 +254,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return result;
     }
 
+    // Comparaciones de igualdad y diferencia (==, !=)
     @Override
     public Object visitExprIgualdad(ComixParser.ExprIgualdadContext ctx) {
         Object result = visit(ctx.exprRelacional(0));
@@ -171,12 +270,14 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return result;
     }
 
+    // Comparaciones relacionales (>, <, >=, <=)
     @Override
     public Object visitExprRelacional(ComixParser.ExprRelacionalContext ctx) {
         Object result = visit(ctx.exprTuberia(0));
         for (int i = 1; i < ctx.exprTuberia().size(); i++) {
             String operador = ctx.getChild(i * 2 - 1).getText();
             Object sig = visit(ctx.exprTuberia(i));
+
             double v1 = aNumero(result);
             double v2 = aNumero(sig);
 
@@ -200,7 +301,6 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
 
     @Override
     public Object visitExprTuberia(ComixParser.ExprTuberiaContext ctx) {
-        // En Comix, ~> propaga el valor de la izquierda hacia la capa derecha
         Object result = visit(ctx.exprAditiva(0));
         for (int i = 1; i < ctx.exprAditiva().size(); i++) {
             result = visit(ctx.exprAditiva(i));
@@ -209,29 +309,21 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     /**
-     * ============================================================
-     * NIVEL ADITIVO: SUMA (+) Y RESTA (-)
-     * ============================================================
-     * Este método recorre las expresiones aditivas.
-     * Es el equivalente al "visitExpresion" que explicó la maestra en clase.
+     * NIVEL ADITIVO (SUMA '+' Y RESTA '-'):
+     * - Suma aritmética si ambos son números.
+     * - Concatenación de cadenas si alguno de los operandos es String (str).
+     * - Resta aritmética numérica.
      */
     @Override
     public Object visitExprAditiva(ComixParser.ExprAditivaContext ctx) {
-        // 1. Toma el primer operando (término inicial)
         Object result = visit(ctx.exprMultiplicativa(0));
-
-        // 2. Itera sobre los siguientes operandos intercalados con '+' o '-'
         for (int i = 1; i < ctx.exprMultiplicativa().size(); i++) {
-            // Se obtiene el operador que está en la posición impar (1, 3, 5...)
             String operador = ctx.getChild(i * 2 - 1).getText();
             Object sig = visit(ctx.exprMultiplicativa(i));
 
-            // >>> OPERACIÓN: SUMA (+) <<<
             if (operador.equals("+")) {
                 result = sumar(result, sig);
-            }
-            // >>> OPERACIÓN: RESTA (-) <<<
-            else if (operador.equals("-")) {
+            } else if (operador.equals("-")) {
                 result = restar(result, sig);
             }
         }
@@ -239,34 +331,22 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     /**
-     * ============================================================
-     * NIVEL MULTIPLICATIVO: MULTIPLICACIÓN (*) Y DIAGONAL (/)
-     * ============================================================
-     * [TAREA DE CLASE]: Aquí se agregaron los términos de multiplicación
-     * y diagonal (división), además del residuo (%).
-     * Es el equivalente al "visitTermino" dejado de tarea.
+     * NIVEL MULTIPLICATIVO (MULTIPLICACIÓN '*' Y DIVISIÓN '/'):
+     * - Multiplicación y división respetando precedencia.
+     * - Validación de división entre cero para evitar caídas.
      */
     @Override
     public Object visitExprMultiplicativa(ComixParser.ExprMultiplicativaContext ctx) {
-        // 1. Toma el primer factor
         Object result = visit(ctx.exprMatricial(0));
-
-        // 2. Itera sobre los siguientes factores intercalados con '*', '/' o '%'
         for (int i = 1; i < ctx.exprMatricial().size(); i++) {
-            // Se obtiene el operador (* o /) en la posición impar
             String operador = ctx.getChild(i * 2 - 1).getText();
             Object sig = visit(ctx.exprMatricial(i));
 
-            // >>> TAREA: OPERACIÓN MULTIPLICACIÓN (*) <<<
             if (operador.equals("*")) {
                 result = multiplicar(result, sig);
-            }
-            // >>> TAREA: OPERACIÓN DIAGONAL / DIVISIÓN (/) <<<
-            else if (operador.equals("/")) {
+            } else if (operador.equals("/")) {
                 result = dividir(result, sig);
-            }
-            // >>> OPERACIÓN ADICIONAL: MÓDULO / RESIDUO (%) <<<
-            else if (operador.equals("%")) {
+            } else if (operador.equals("%")) {
                 result = modulo(result, sig);
             }
         }
@@ -277,7 +357,6 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     public Object visitExprMatricial(ComixParser.ExprMatricialContext ctx) {
         Object result = visit(ctx.exprPotencia(0));
         for (int i = 1; i < ctx.exprPotencia().size(); i++) {
-            // Producto matricial o ponderación simbólica @
             result = multiplicar(result, visit(ctx.exprPotencia(i)));
         }
         return result;
@@ -304,7 +383,6 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         if (ctx.exprPrimaria() != null) {
             return visit(ctx.exprPrimaria());
         }
-        // Operadores unarios: - o !
         Object val = visit(ctx.exprUnaria());
         if (ctx.RESTA() != null) {
             if (val instanceof Integer) return -((Integer) val);
@@ -315,10 +393,13 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return val;
     }
 
+    /**
+     * FACTORES E IDENTIFICADORES (GET EN MEMORIA):
+     * Cuando se encuentra un ID en una expresión, se recupera con memoria.get(id).
+     */
     @Override
     public Object visitExprPrimaria(ComixParser.ExprPrimariaContext ctx) {
         if (ctx.expresion() != null) {
-            // Agrupación de monitos 🐒 expresion 🐵 o ( expresion )
             return visit(ctx.expresion());
         } else if (ctx.LIT_INDICE() != null) {
             return Integer.parseInt(ctx.LIT_INDICE().getText());
@@ -326,7 +407,6 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
             return Double.parseDouble(ctx.LIT_PESO().getText());
         } else if (ctx.LIT_CORPUS() != null) {
             String texto = ctx.LIT_CORPUS().getText();
-            // Quitar comillas dobles
             if (texto.startsWith("\"") && texto.endsWith("\"") && texto.length() >= 2) {
                 texto = texto.substring(1, texto.length() - 1);
             }
@@ -337,10 +417,12 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
             return visit(ctx.tensorLiteral());
         } else if (ctx.ID() != null) {
             String id = ctx.ID().getText();
+
+            // >>> GET A NIVEL DE FACTOR (RECUPERACIÓN DESDE MEMORIA) <<<
             if (memoria.containsKey(id)) {
                 return memoria.get(id);
             } else {
-                System.err.println("Advertencia: Variable no inicializada '" + id + "', usando 0.");
+                System.err.printf("Advertencia: Variable '%s' no encontrada en memoria. Usando valor 0.%n", id);
                 return 0;
             }
         }
@@ -362,11 +444,27 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     // ============================================================
-    // 6. MÉTODOS AUXILIARES PARA CÁLCULOS ARITMÉTICOS
+    // 7. MÉTODOS AUXILIARES ARITMÉTICOS Y TIPOS
     // ============================================================
 
-    // --- OPERACIÓN: SUMA (+) ---
-    // Soporta suma entre enteros, decimales y concatenación de texto
+    // Valor por defecto según el tipo solicitado
+    private Object obtenerValorPorDefecto(String tipo) {
+        String t = tipo.toLowerCase();
+        if (t.contains("indice") || t.contains("int")) {
+            return 0;
+        } else if (t.contains("peso") || t.contains("float") || t.contains("double")) {
+            return 0.0;
+        } else if (t.contains("pulso") || t.contains("bool")) {
+            return false;
+        } else if (t.contains("corpus") || t.contains("str")) {
+            return "";
+        } else if (t.contains("tensor")) {
+            return new ArrayList<>();
+        }
+        return 0;
+    }
+
+    // Suma con soporte de concatenación si alguno es String
     private Object sumar(Object a, Object b) {
         if (a instanceof String || b instanceof String) {
             return formatearValor(a) + formatearValor(b);
@@ -377,8 +475,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return aNumero(a) + aNumero(b);
     }
 
-    // --- OPERACIÓN: RESTA (-) ---
-    // Resta numérica para enteros y decimales
+    // Resta numérica (entero o flotante double)
     private Object restar(Object a, Object b) {
         if (a instanceof Integer && b instanceof Integer) {
             return (Integer) a - (Integer) b;
@@ -386,8 +483,7 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return aNumero(a) - aNumero(b);
     }
 
-    // --- [TAREA] OPERACIÓN: MULTIPLICACIÓN (*) ---
-    // Multiplica dos factores (enteros o flotantes)
+    // Multiplicación (entero o flotante double)
     private Object multiplicar(Object a, Object b) {
         if (a instanceof Integer && b instanceof Integer) {
             return (Integer) a * (Integer) b;
@@ -395,21 +491,19 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
         return aNumero(a) * aNumero(b);
     }
 
-    // --- [TAREA] OPERACIÓN: DIAGONAL / DIVISIÓN (/) ---
-    // Divide dos factores y previene error de división entre cero
+    // División con validación de división entre cero
     private Object dividir(Object a, Object b) {
         double divisor = aNumero(b);
         if (divisor == 0.0) {
-            System.err.println("Error en ejecución: División entre cero (diagonal /). Se retorna 0.");
+            System.err.println("Error en ejecución: División entre cero (/ detectado). Se retorna 0.");
             return (a instanceof Integer && b instanceof Integer) ? 0 : 0.0;
         }
-        if (a instanceof Integer && b instanceof Integer) {
-            return (Integer) a / (Integer) b;
+        if (a instanceof Integer && b instanceof Integer && ((Integer) a) % ((Integer) b) == 0) {
+            return ((Integer) a) / ((Integer) b);
         }
         return aNumero(a) / divisor;
     }
 
-    // --- OPERACIÓN: MÓDULO O RESIDUO (%) ---
     private Object modulo(Object a, Object b) {
         int div = (int) aNumero(b);
         if (div == 0) return 0;
@@ -435,11 +529,9 @@ public class ComixCustomVisitor extends ComixBaseVisitor<Object> {
     }
 
     private String formatearValor(Object val) {
-        if (val == null) {
-            return "nulo";
-        }
+        if (val == null) return "nulo";
         if (val instanceof Boolean) {
-            return ((Boolean) val) ? "activo" : "inactivo";
+            return ((Boolean) val) ? "true" : "false";
         }
         return String.valueOf(val);
     }

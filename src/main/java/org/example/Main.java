@@ -84,12 +84,11 @@ public class Main {
             tokens.fill();
 
             System.out.println("\n[1] TOKENS RECONOCIDOS (" + tokens.getTokens().size() + " tokens):");
-            int tokenCount = 0;
             for (Token token : tokens.getTokens()) {
                 if (token.getType() == Token.EOF) continue;
                 String tokenName = ComixLexer.VOCABULARY.getSymbolicName(token.getType());
-                System.out.printf("  #%-3d | L%-3d:C%-3d | %-20s | '%s'%n",
-                        ++tokenCount, token.getLine(), token.getCharPositionInLine(), tokenName, token.getText());
+                System.out.printf("Token: %s (Tipo: %s) in %d, Col %d%n",
+                        token.getText(), tokenName, token.getLine(), token.getCharPositionInLine());
             }
 
             // 3. Análisis Sintáctico
